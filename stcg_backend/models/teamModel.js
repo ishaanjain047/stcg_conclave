@@ -13,6 +13,7 @@ const teamSchema = new mongoose.Schema({
     minlength: 5,
     maxlength: 1024,
   },
+  refreshToken: String,
 });
 
 const Team = mongoose.model("Teams", teamSchema);

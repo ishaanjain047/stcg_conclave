@@ -1,36 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./login.css";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import axios from "../../api/axios";
+import { useNavigate, useLocation } from "react-router-dom";
+import useAuth from "../../hooks/useAuth.js";
 
-const Login = ({ setLoginUser }) => {
-  let navigate = useNavigate();
-  const [user, setUser] = useState({
-    name: "",
-    password: "",
-  });
+const LOGIN_URL = "/api/auth";
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUser({
-      ...user,
-      [name]: value,
-    });
+const Login = () => {
+  const { setAuth, persist, setPersist } = useAuth();
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from?.pathname || "/stcg";
+
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+
+  const login = async () => {
+    try {
+      const response = await axios.post(
+        LOGIN_URL,
+        JSON.stringify({ name, password }),
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
+      console.log(JSON.stringify(response?.data));
+      //console.log(JSON.stringify(response));
+      const accessToken = response?.data?.accessToken;
+      setAuth({ name, password, accessToken });
+      // navigate("/stcg");
+      navigate(from, { replace: true });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const login = () => {
-    axios.post("http://localhost:9002/api/enterevent", user).then((res) => {
-      if (res.status === 200) {
-        alert("Login Successful");
-        console.log("res is ", res);
-        const team = res.data;
-        setLoginUser(team);
-        navigate("/");
-      } else {
-        alert("Please , Try again");
-      }
-    });
+  const togglePersist = () => {
+    setPersist((prev) => !prev);
   };
+
+  useEffect(() => {
+    localStorage.setItem("persist", persist);
+  }, [persist]);
 
   return (
     <div className="login">
@@ -38,15 +53,15 @@ const Login = ({ setLoginUser }) => {
       <input
         type="text"
         name="name"
-        value={user.name}
-        onChange={handleChange}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
         placeholder="Enter your Team Name"
       ></input>
       <input
         type="password"
         name="password"
-        value={user.password}
-        onChange={handleChange}
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
         placeholder="Enter your Password"
       ></input>
       <div className="button" onClick={login}>
@@ -55,6 +70,15 @@ const Login = ({ setLoginUser }) => {
       <div>or</div>
       <div className="button" onClick={() => navigate("/register")}>
         Register
+      </div>
+      <div className="persistCheck">
+        <input
+          type="checkbox"
+          id="persist"
+          onChange={togglePersist}
+          checked={persist}
+        />
+        <label htmlFor="persist">Trust This Device</label>
       </div>
     </div>
   );

@@ -23,9 +23,7 @@ const renderer = ({ hours, minutes, seconds, completed }) => {
 const getLocalStorageValue = (s) => localStorage.getItem(s);
 
 const Timer = () => {
-  const [data, setData] = useState(
-    { date: Date.now(), delay: 180000 } //10 seconds
-  );
+  const [data, setData] = useState({ date: Date.now(), delay: 100000 });
   const wantedDelay = 60000; //10 ms
 
   //[START] componentDidMount

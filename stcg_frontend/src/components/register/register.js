@@ -22,7 +22,7 @@ const Register = () => {
     const { name, password } = team;
     console.log("team is ", team);
     if (name && password) {
-      axios.post("http://localhost:9002/api/registerteam", team).then((res) => {
+      axios.post("http://localhost:9002/api/register", team).then((res) => {
         console.log(res);
         navigate("/login");
       });

@@ -9,6 +9,7 @@ const jwt = require("jsonwebtoken");
 const teamNameSchema = Joi.object({
   name: Joi.string().min(2).max(50).required(),
   password: Joi.string().min(5).max(1024).required(),
+  refreshToken: Joi.string(),
 });
 
 router.post("/", async (req, res) => {
@@ -26,9 +27,10 @@ router.post("/", async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   team.password = await bcrypt.hash(team.password, salt);
   await team.save();
-  const token = jwt.sign({ _id: team.id }, "civilconclavewebdprivate");
-  console.log(team);
-  res.header("x-auth-token", token).send(_.pick(team, ["_id", "name"]));
+  // const token = jwt.sign({ _id: team.id }, "civilconclavewebdprivate");
+  // console.log(team);
+  // res.header("x-auth-token", token).send(_.pick(team, ["_id", "name"]));
+  res.send(true);
 });
 
 module.exports = router;
